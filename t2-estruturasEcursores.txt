@@ -1,0 +1,73 @@
+Instruções
+Enviar o script dos exercicios:
+1)Criar um bloco anônimo que entre com o id do empregado.
+Se o empregado receber entre 2000 e 4000, exibir o seu nome e o seu salário acrescido de 10%.
+Se o empregado receber entre 4001 e 5000, exibir o seu sobrenome e o seu salário acrescido de 20%.
+Caso contrário, exibir o id do cargo, o nome do departamento e o salário SEM aumento.
+
+DECLARE
+    v_id INTEGER := :ID_Empregado;
+    v_nome VARCHAR(50);
+    v_sobrenome VARCHAR(50);
+    v_salario employees.salary%TYPE;
+    v_nomeDepto VARCHAR(50);
+    v_idCargo jobs.job_id%TYPE;
+BEGIN
+    SELECT e.first_name, e.last_name, e.salary, d.department_name, j.job_id
+    INTO v_nome, v_sobrenome, v_salario, v_nomeDepto, v_idCargo
+    FROM employees e
+    JOIN departments d ON d.department_id = e.department_id
+    JOIN jobs j ON j.job_id = e.job_id
+    WHERE e.employee_id = v_id;
+    IF v_salario BETWEEN 2000 AND 4000 THEN
+    v_salario := v_salario * 1.10;
+    DBMS_OUTPUT.PUT_LINE('Nome: ' || v_nome);
+    DBMS_OUTPUT.PUT_LINE('Sálario + 10%: ' || v_salario);
+    ELSIF v_salario BETWEEN 4001 AND 5000 THEN
+    v_salario := v_salario*1.20;
+    DBMS_OUTPUT.PUT_LINE('Sobrenome: ' || v_sobrenome);
+    DBMS_OUTPUT.PUT_LINE('Salário + 20%: ' || v_salario);
+    ELSE
+    DBMS_OUTPUT.PUT_LINE('ID Cargo: ' || v_idCargo);
+    DBMS_OUTPUT.PUT_LINE('Nome Departamento: ' || v_nomeDepto);
+    DBMS_OUTPUT.PUT_LINE('Salário Empregado: ' || v_salario);
+    END IF;
+END;
+
+
+
+2)Exibir todas as tabuadas de 1 a 10.
+DICAS:
+- FUNÇÃO MOD
+ - ESTRUTURA CONDICIONAL COM LAÇO
+ - DOIS LAÇOS
+
+BEGIN
+    FOR i IN 1..10 LOOP
+        FOR j IN 1..10 LOOP
+        DBMS_OUTPUT.PUT_LINE(i || ' x ' || j || ' = ' || i*j );
+    END LOOP;
+        END LOOP;
+END;
+
+3)Criar um bloco que informe o id de um continente e exiba os países cadastrados e a quantidade de localizações neste país
+DICA: JOIN COM 3 TABELAS
+DECLARE
+    v_cont INTEGER := :ID_CONTINENTE;
+    v_nomePais VARCHAR(50);
+    v_numLoc INTEGER;
+CURSOR cursor1 IS
+SELECT c.country_name, COUNT(l.location_id) AS num_locations
+FROM countries c
+JOIN locations l ON c.country_id = l.country_id
+WHERE c.region_id = region_id
+GROUP BY c.country_name;
+BEGIN
+    OPEN cursor1;
+    LOOP
+        FETCH cursor1 INTO v_nomePais, v_numLoc;
+        EXIT WHEN cursor1%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(v_nomePais || '-' || v_numLoc);
+    END LOOP;
+    CLOSE cursor1;
+END;
